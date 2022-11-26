@@ -1,34 +1,24 @@
-# About emptyExample
+# About scaniO
 
-![Screenshot of emptyExample](emptyExample.png)
+![logo of scaniO](icon.png)
 
 ### Learning Objectives
 
-This example is the simplest possible openFrameworks app! It does nothing.  
+scaniO is an experimental camera that views the world of time and space in different ways. 
+scaniO uses variations on the slit-scan technique that gives images where time is spread out - where parts of the image are older or younger than others. 
+scan the world in 'push' style where only the thing that move appear in the cameras or explore 'wipe' style where those things that move get distorted and their motion through the world leaves trails and traces.  Both styles work in horizontally or vertically. Double tap the screen to explore the different styles.
 
-...Well, *almost* nothing. Although it may not be apparent, the emptyExample activates all of the default system states. (For example, it sets the default fill color to white; it just doesn't happen to draw anything with it.)
+scaniO has no option to record your images - deliberately so - it is a lens or periscope into seeing time in a different way - though if you want to save what you have seen to ee it again another time just use your camera's options to snap a screenshot or record the screen to video.
 
-The emptyExample is great for making sure that your openFrameworks development environment is compiling properly. It can also be useful as a "starter template" for making simple programs.
-
-The emptyExample will help you understand what are the bare necessities of an openFrameworks program. In this regard, you can think of it as a "Hello World" for OF.
-
-This variation on the original emptyExample sets up the bare necessities for an iOS application environment.
+• Double tap the screen to loop through the 4 different styles of seeing the world, 
+• Drag left and right across the screen to speed up and slow down the capturing of time.
 
 
-### Expected Behavior
+### https://buzzo.com  
 
-When launching this app, you should see a light-gray screen.
+https://youtube.com/danbuzzo
 
-* There's no interaction.
-* There's nothing to see.
-* That's it.
+© 2022 daniel buzzo
 
-Instructions for using the app:
 
-* There's nothing to do. Move along.
-
-### Other classes used in this file
-
-This Example uses the following classes:
-
-* [ofxiOS](http://openframeworks.cc/documentation/ofxiOS/) (for compiling openFrameworks to an Apple iOS device)
+![Screenshot of scaniO](example.jpg)
