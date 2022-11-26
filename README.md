@@ -1,0 +1,2 @@
+# scaniO
+iOS slitscan application 
