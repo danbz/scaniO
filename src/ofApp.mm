@@ -41,27 +41,26 @@ void ofApp::setup(){
     ofSetBackgroundColor(0, 0, 0); // set the background colour to  black
     ofDisableSmoothing();
     ofxiOSDisableIdleTimer();
-    
-    
+    b_screenGrab = false;
+    camName = "main camera";
     pixels = grabber.getPixels();
     
-    // ofxiOSScreenGrab(0);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     ofColor color;
-    float micLevel;
+   // float micLevel;
     int yHeight;
     grabber.update();
     // update the video grabber object
     if (grabber.isFrameNew()){
         pixels = grabber.getPixels();
-        // pixels.mirror(true, false);
+         pixels.mirror(true, true);
     }
     
     switch (scanStyle) {
-        case 1: // scan horizontal
+        case 4: // scan horizontal
             for (int y=0; y<camHeight; y++ ) { // loop through all the pixels on a line
                 color = pixels.getColor( xSteps, y); // get the pixels on line ySteps
                 videoPixels.setColor(xSteps, y, color);
@@ -74,7 +73,7 @@ void ofApp::update(){
             xSteps += speed; // step on to the next line. increase this number to make things faster
             break;
             
-        case 2: // scan vertical
+        case 1: // scan vertical
             for (int x=0; x<camWidth; x++ ) { // loop through all the pixels on a line
                 color = pixels.getColor(x, ySteps); // get the pixels on line ySteps
                 videoPixels.setColor(x, ySteps, color);
@@ -104,7 +103,7 @@ void ofApp::update(){
             // xSteps++;
             break;
             
-        case 4: // scan vertical from centre
+        case 2: // scan vertical from centre
             for (int x=0; x<camWidth; x++ ) { // loop through all the pixels on a line to draw new column at 0 in target image
                 color = pixels.getColor(x, camHeight/2); // get the pixels on line ySteps
                 videoPixels.setColor(x, 1, color);
@@ -120,8 +119,8 @@ void ofApp::update(){
             
         case 5: // scan horizontal from centre with mic
             //if (xSteps < camWidth){
-            micLevel = ofxiOSGetMicAverageLevel();
-            yHeight = camHeight * micLevel;
+          //  micLevel = ofxiOSGetMicAverageLevel();
+            yHeight = camHeight ;
             ofPushStyle();
             ofSetColor(0, 0, 0, 5); // set transparent black to draw rect and fade pixel buffer;
             ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
@@ -143,6 +142,7 @@ void ofApp::update(){
         default:
             break;
     }
+ 
 }
 
 //--------------------------------------------------------------
@@ -167,10 +167,20 @@ void ofApp::draw(){
     //        ofDrawBitmapString(" scanning " + scanName + " , 1-scan horizontal 2-scan vertical 3-ribbon horizontal 4-ribbon vertical 5-slitscan clock, r-radial, c-camview, a-antialiased, FPS:" + ofToString(ofGetFrameRate()), 10, sHeight -10);
     //    }
     
+    if (b_screenGrab) {
+        ofxiOSScreenGrab(0);
+        b_screenGrab = false;
+        ofSetColor(0);
+        ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
+    }
+    
     ofPushStyle();
     ofSetColor(255, 0, 0 );
-    ofDrawRectangle(10, 10, 50, 50); // draw screenshot button on screen
+    ofDrawCircle(ofGetWidth()/2 -25 , ofGetHeight() - 70, 50); // draw screenshot button on screen
     ofPopStyle();
+    ofDrawBitmapString(camName , 20, ofGetHeight()-20);
+    
+ 
 }
 
 //--------------------------------------------------------------
@@ -198,55 +208,65 @@ void ofApp::touchUp(ofTouchEventArgs & touch){
             grabber.setup(camWidth, camHeight);
             currdeviceID = 1;
             grabber.setDeviceID(currdeviceID); // front facing camera
+            ofSetColor(0);
+            ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
+            camName = "front camera";
     
         } else if (touch.y <ofGetHeight()/2 && currdeviceID ==1){
             grabber.close();
             grabber.setup(camWidth, camHeight);
             currdeviceID = 0;
             grabber.setDeviceID(currdeviceID); // front facing camera
+            ofSetColor(0);
+            ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
+            camName = "main camera";
         }
 }
 
 //--------------------------------------------------------------
 void ofApp::touchDoubleTap(ofTouchEventArgs & touch){
-    if (scanStyle < 5 ){
-        scanStyle ++;
-    } else {
-        scanStyle = 1;
-    }
-    switch (scanStyle) {
-            
-        case '1':
-            scanStyle = 1;
-            scanName = "horizontal";
-            break;
-        case '2':
-            scanStyle = 2;
-            scanName = "vertical";
-            break;
-        case '3':
-            scanStyle = 3;
-            scanName = "horizontal ribbon";
-            break;
-        case '4':
-            scanStyle = 4;
-            scanName = "vertical ribbon";
-            break;
-        case '5':
-            scanStyle = 5;
-            scanName = "let's be a slitscan clock";
-            currTime = ofGetSystemTimeMillis();
-            break;
-        case '6':
-            b_drawCam =!b_drawCam;
-            break;
-        case '7':
-            b_radial =!b_radial;
-            break;
-            
-        default:
-            break;
-    }
+//    if (scanStyle < 5 ){
+//        scanStyle ++;
+//    } else {
+//        scanStyle = 1;
+//    }
+//    switch (scanStyle) {
+//
+//        case '1':
+//            scanStyle = 1;
+//            scanName = "horizontal";
+//            break;
+//        case '2':
+//            scanStyle = 2;
+//            scanName = "vertical";
+//            break;
+//        case '3':
+//            scanStyle = 3;
+//            scanName = "horizontal ribbon";
+//            break;
+//        case '4':
+//            scanStyle = 4;
+//            scanName = "vertical ribbon";
+//            break;
+//        case '5':
+//            scanStyle = 5;
+//            scanName = "let's be a slitscan clock";
+//            currTime = ofGetSystemTimeMillis();
+//            break;
+//        case '6':
+//            b_drawCam =!b_drawCam;
+//            break;
+//        case '7':
+//            b_radial =!b_radial;
+//            break;
+//
+//        default:
+//            break;
+//    }
+    b_screenGrab = true;
+    
+   // saveToPhotos();
+
 }
 
 //--------------------------------------------------------------
@@ -271,22 +291,24 @@ void ofApp::gotMemoryWarning(){
 
 //--------------------------------------------------------------
 void ofApp::deviceOrientationChanged(int newOrientation){
+    cout << "orientation is now: " << ofToString( newOrientation ) << endl;
+    scanStyle = newOrientation;
+    
     
 }
 //--------------------------------------------------------------
 void ofApp::saveToPhotos(){
-    ofFbo screen;
+    // ofFbo screen;
     ofImage photo;
-    screen.allocate(ofGetWidth(),ofGetHeight(),GL_RGBA);
+    // screen.allocate(ofGetWidth(),ofGetHeight(),GL_RGBA);
     //    screen.begin();
     //    ofClear(0,0,0,255);
     //    ofSetColor(255,255,255,255);
-    //    //DRAW YOUR FBO HERE
+     //  videoTexture
     //    screen.end();
     ofPixels pix;
-    screen.readToPixels(pix);
+    videoTexture.readToPixels(pix);
     photo.setFromPixels(pix);
-    
     
     CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, photo.getPixels().getData(), (photo.getWidth()*photo.getHeight() * 4), NULL);
     CGImageRef imageRef = CGImageCreate(photo.getWidth(), photo.getHeight(), 8, 32, 4*photo.getWidth(), CGColorSpaceCreateDeviceRGB(), kCGBitmapByteOrderDefault, provider, NULL, NO, kCGRenderingIntentDefault);

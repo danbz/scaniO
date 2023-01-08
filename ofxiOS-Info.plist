@@ -41,6 +41,8 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This application requires permission to save images to your photo library</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIImageName</key>

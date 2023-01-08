@@ -42,9 +42,9 @@ class ofApp : public ofxiOSApp{
     
     int xSteps, ySteps, scanStyle, speed, currdeviceID, newDeviceID;
     int sWidth, sHeight;
-    bool b_radial, b_drawCam, b_smooth;
+    bool b_radial, b_drawCam, b_smooth, b_screenGrab;
     float currTime, camWidth, camHeight;
-    string scanName, time;
+    string scanName, time, camName;
     
 };
 
