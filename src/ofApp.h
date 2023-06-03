@@ -59,8 +59,10 @@ class ofApp : public ofxiOSApp{
     
     ofParameter<float> frameRate;
     ofxPanel gui;
-    
+    ofFbo fbo;
     ofSoundPlayer cameraClick;
+    
+    ofImage videoImage, swapImage;
 };
 
 

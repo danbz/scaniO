@@ -24,9 +24,9 @@ void ofApp::setup(){
     // grabber.setup(480, 360, OF_PIXELS_BGRA);
     grabber.setDeviceID(currdeviceID); // front facing camera
     //grabber.setup(1280, 720, OF_PIXELS_BGRA);
-   // grabber.setup(1280, 720);
-    grabber.setup(640, 460);
-    grabber.setDesiredFrameRate(0);
+    grabber.setup(1280, 720);
+   // grabber.setup(640, 460);
+    grabber.setDesiredFrameRate(60);
     
     //// slit scan
     // float aspectRatio = camHeight / camWidth;
@@ -47,7 +47,11 @@ void ofApp::setup(){
     videoPixels.allocate(camWidth,camHeight, OF_PIXELS_RGB); // set up our pixel object to be the same size as our camera object
     videoTexture.allocate(videoPixels);
     swapPixels.allocate(camWidth,camHeight, OF_PIXELS_RGB);
-    // ofSetVerticalSync(true);
+    
+    fbo.allocate(camWidth, camHeight, OF_PIXELS_RGBA);
+    swapImage.allocate( camWidth, camHeight,  OF_IMAGE_COLOR);
+    
+    // ofSetVerticalSync(true);o
     ofSetBackgroundColor(0, 0, 0); // set the background colour to  black
     ofDisableSmoothing();
     ofxiOSDisableIdleTimer();
@@ -130,7 +134,16 @@ void ofApp::update(){
                     videoPixels.setColor(x, y, videoPixels.getColor( x-1, y )); // copy each pixel in the target to 1 pixel the right
                 }
             }
-            // }
+//            // }
+//            swapImage = grabber.getPixels();
+//            fbo.begin();
+//            swapImage.draw(0, 0, camWidth, camHeight);
+//            videoImage.draw(5,0, camWidth,camHeight);
+//            fbo.end();
+//            fbo.readToPixels(videoImage, 0);
+//            videoImage.update();
+//            videoTexture.loadData(videoImage);
+            
             videoTexture.loadData(videoPixels);
             // xSteps++;
             break;
