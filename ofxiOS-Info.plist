@@ -24,12 +24,10 @@
 	<string>1.0</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>This application uses the camera</string>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen.storyboard</string>
-	<key>UIRequiresFullScreen</key>
+	<key>UIApplicationExitsOnSuspend</key>
 	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
 	<key>UIStatusBarHidden</key>
 	<true/>
 	<key>UISupportedInterfaceOrientations</key>
@@ -41,12 +39,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This application requires permission to save images to your photo library</string>
-	<key>UILaunchScreen</key>
-	<dict>
-		<key>UIImageName</key>
-		<string></string>
-	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs to access the camera</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs to access the microphone</string>
 </dict>
 </plist>

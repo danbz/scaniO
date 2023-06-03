@@ -2,12 +2,20 @@
 /*
  Project Title: video slitscan camera for iOS
  Description:
- ©Daniel Buzzo 2022
+ ©Daniel Buzzo 2022, 2023
  dan@buzzo.com
  http://buzzo.com
  https://github.com/danbz
  */
 
+/*to do list
+ add tap to focus?
+ add controls for front back camera
+ add exposure control?
+ speed up code
+ 
+ 
+ */
 //--------------------------------------------------------------
 void ofApp::setup(){	
     ofSetOrientation(OF_ORIENTATION_90_RIGHT);//Set iOS to Orientation Landscape Right
@@ -42,21 +50,38 @@ void ofApp::setup(){
     ofDisableSmoothing();
     ofxiOSDisableIdleTimer();
     b_screenGrab = false;
-    camName = "main camera";
+    camName = "main cam";
     pixels = grabber.getPixels();
     
+    // gui
+    screenShot.addListener(this,&ofApp::screenGrab);
+    swapCam.addListener(this,&ofApp::swapCamera);
+    
+    // change default sizes for ofxGui so it's usable in small/high density screens
+    ofxGuiSetFont("Questrial-Regular.ttf",20,true,true);
+    ofxGuiSetTextPadding(4);
+    ofxGuiSetDefaultWidth(400);
+    ofxGuiSetDefaultHeight(36);
+    gui.setup(scanName + " " + camName);
+    gui.add(screenShot.setup("save image", 50, 50));
+    gui.add(swapCam.setup("swap Camera", 50, 50));
+    gui.add(frameRate.set( "speed", 60, 1, 120 ));
+    //  gui.add(mainCam.set("b_main", true));
+    // gui.add(screenSize.set("screenSize", ofToString(ofGetWidth()) + "x" + ofToString(ofGetHeight())));
+    gui.setPosition(40, 20);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     ofColor color;
-   // float micLevel;
+    // float micLevel;
     int yHeight;
+    ofSetFrameRate(frameRate);
     grabber.update();
     // update the video grabber object
     if (grabber.isFrameNew()){
         pixels = grabber.getPixels();
-         pixels.mirror(true, true);
+        pixels.mirror(true, true);
     }
     
     switch (scanStyle) {
@@ -118,8 +143,7 @@ void ofApp::update(){
             break;
             
         case 5: // scan horizontal from centre with mic
-            //if (xSteps < camWidth){
-          //  micLevel = ofxiOSGetMicAverageLevel();
+            
             yHeight = camHeight ;
             ofPushStyle();
             ofSetColor(0, 0, 0, 5); // set transparent black to draw rect and fade pixel buffer;
@@ -142,25 +166,12 @@ void ofApp::update(){
         default:
             break;
     }
- 
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofSetColor(255);
-    ofHideCursor;
-    
-    if (b_radial){ // draw radial ribbon
-        for (int i =0; i<videoTexture.getWidth(); i+=speed){
-            ofPushMatrix();
-            ofTranslate(sWidth/2, sHeight/2); // centre in right portion of screen
-            ofRotateZDeg( ofMap(i, 0, videoTexture.getWidth()/speed, 0, 360));
-            videoTexture.drawSubsection(0, 0, speed +2, videoTexture.getHeight(), i, 0);
-            ofPopMatrix();
-        }
-    } else { // straight slices
-        videoTexture.draw( 0, 0, sWidth, sHeight); // draw the seconds slitscan video texture we have constructed
-    }
+    videoTexture.draw( 0, 0, sWidth, sHeight); // draw the  slitscan video texture we have constructed
     
     //    if (b_drawCam){ // draw camera debug to screen
     //        grabber.draw(sWidth-camWidth/4 -10, sHeight-camHeight/4 -10, camWidth/4, camHeight/4); // draw our plain image
@@ -168,24 +179,20 @@ void ofApp::draw(){
     //    }
     
     if (b_screenGrab) {
+        //  screenGrab();
+        // grab screen before GUI is drawn
         ofxiOSScreenGrab(0);
         b_screenGrab = false;
         ofSetColor(0);
         ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
     }
     
-    ofPushStyle();
-    ofSetColor(255, 0, 0 );
-    ofDrawCircle(ofGetWidth()/2 -25 , ofGetHeight() - 70, 50); // draw screenshot button on screen
-    ofPopStyle();
-    ofDrawBitmapString(camName , 20, ofGetHeight()-20);
-    
- 
-}
-
-//--------------------------------------------------------------
-void ofApp::exit(){
-    
+    //    ofPushStyle();
+    //    ofSetColor(255, 0, 0 );
+    //    ofDrawCircle(ofGetWidth()/2 -25 , ofGetHeight() - 45, 25); // draw screenshot button on screen
+    //    ofPopStyle();
+    ofDrawBitmapString("FPS: " + ofToString(ofGetFrameRate()) , 20, ofGetHeight()-20);    
+    gui.draw();
 }
 
 //--------------------------------------------------------------
@@ -195,78 +202,73 @@ void ofApp::touchDown(ofTouchEventArgs & touch){
 
 //--------------------------------------------------------------
 void ofApp::touchMoved(ofTouchEventArgs & touch){
-    
-    ofSetFrameRate( ofMap(touch.x ,0,  ofGetWidth(), 1, 60) );
+    //  ofSetFrameRate( ofMap(touch.x ,0,  ofGetWidth(), 1, 120) );
     // newDeviceID =  abs (ofMap(touch.y ,0,  ofGetHeight(), 0, 1));
-    
 }
 
 //--------------------------------------------------------------
 void ofApp::touchUp(ofTouchEventArgs & touch){
-        if (touch.y >ofGetHeight()/2 && currdeviceID ==0){
-            grabber.close();
-            grabber.setup(camWidth, camHeight);
-            currdeviceID = 1;
-            grabber.setDeviceID(currdeviceID); // front facing camera
-            ofSetColor(0);
-            ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
-            camName = "front camera";
-    
-        } else if (touch.y <ofGetHeight()/2 && currdeviceID ==1){
-            grabber.close();
-            grabber.setup(camWidth, camHeight);
-            currdeviceID = 0;
-            grabber.setDeviceID(currdeviceID); // front facing camera
-            ofSetColor(0);
-            ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
-            camName = "main camera";
-        }
+    //    if (touch.y >ofGetHeight()/2 && currdeviceID ==0){
+    //        grabber.close();
+    //        grabber.setup(camWidth, camHeight);
+    //        currdeviceID = 1;
+    //        grabber.setDeviceID(currdeviceID); // front facing camera
+    //        ofSetColor(0);
+    //        ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
+    //        camName = "main camera";
+    //    } else if (touch.y <ofGetHeight()/2 && currdeviceID ==1){
+    //        grabber.close();
+    //        grabber.setup(camWidth, camHeight);
+    //        currdeviceID = 0;
+    //        grabber.setDeviceID(currdeviceID); // front facing camera
+    //        ofSetColor(0);
+    //        ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
+    //        camName = "front camera";
+    //    }
 }
 
 //--------------------------------------------------------------
 void ofApp::touchDoubleTap(ofTouchEventArgs & touch){
-//    if (scanStyle < 5 ){
-//        scanStyle ++;
-//    } else {
-//        scanStyle = 1;
-//    }
-//    switch (scanStyle) {
-//
-//        case '1':
-//            scanStyle = 1;
-//            scanName = "horizontal";
-//            break;
-//        case '2':
-//            scanStyle = 2;
-//            scanName = "vertical";
-//            break;
-//        case '3':
-//            scanStyle = 3;
-//            scanName = "horizontal ribbon";
-//            break;
-//        case '4':
-//            scanStyle = 4;
-//            scanName = "vertical ribbon";
-//            break;
-//        case '5':
-//            scanStyle = 5;
-//            scanName = "let's be a slitscan clock";
-//            currTime = ofGetSystemTimeMillis();
-//            break;
-//        case '6':
-//            b_drawCam =!b_drawCam;
-//            break;
-//        case '7':
-//            b_radial =!b_radial;
-//            break;
-//
-//        default:
-//            break;
-//    }
-    b_screenGrab = true;
-    
-   // saveToPhotos();
-
+    //    if (scanStyle < 5 ){
+    //        scanStyle ++;
+    //    } else {
+    //        scanStyle = 1;
+    //    }
+    //    switch (scanStyle) {
+    //
+    //        case '1':
+    //            scanStyle = 1;
+    //            scanName = "horizontal";
+    //            break;
+    //        case '2':
+    //            scanStyle = 2;
+    //            scanName = "vertical";
+    //            break;
+    //        case '3':
+    //            scanStyle = 3;
+    //            scanName = "horizontal ribbon";
+    //            break;
+    //        case '4':
+    //            scanStyle = 4;
+    //            scanName = "vertical ribbon";
+    //            break;
+    //        case '5':
+    //            scanStyle = 5;
+    //            scanName = "let's be a slitscan clock";
+    //            currTime = ofGetSystemTimeMillis();
+    //            break;
+    //        case '6':
+    //            b_drawCam =!b_drawCam;
+    //            break;
+    //        case '7':
+    //            b_radial =!b_radial;
+    //            break;
+    //
+    //        default:
+    //            break;
+    //    }
+    // b_screenGrab = true;
+    // saveToPhotos();
 }
 
 //--------------------------------------------------------------
@@ -291,10 +293,33 @@ void ofApp::gotMemoryWarning(){
 
 //--------------------------------------------------------------
 void ofApp::deviceOrientationChanged(int newOrientation){
-    cout << "orientation is now: " << ofToString( newOrientation ) << endl;
     scanStyle = newOrientation;
     
-    
+    switch (scanStyle) {
+        case 1:
+            scanName = "vertical wipe";
+            gui.setName(scanName + " " + camName);
+            break;
+            
+        case 2:
+            scanName = "vertical ribbon";
+            gui.setName(scanName + " " + camName);
+            break;
+            
+        case 3:
+            scanName = "horizontal ribbon";
+            gui.setName(scanName + " " + camName);
+            break;
+            
+        case 4:
+            scanName = "horizontal wipe";
+            gui.setName(scanName + " " + camName);
+            break;
+            
+        default:
+            break;
+    }
+    cout << "orientation is now: " << ofToString( newOrientation ) << endl;
 }
 //--------------------------------------------------------------
 void ofApp::saveToPhotos(){
@@ -304,7 +329,7 @@ void ofApp::saveToPhotos(){
     //    screen.begin();
     //    ofClear(0,0,0,255);
     //    ofSetColor(255,255,255,255);
-     //  videoTexture
+    //  videoTexture
     //    screen.end();
     ofPixels pix;
     videoTexture.readToPixels(pix);
@@ -315,4 +340,40 @@ void ofApp::saveToPhotos(){
     NSData *imageData = UIImagePNGRepresentation([UIImage imageWithCGImage:imageRef]);
     UIImage *output = [UIImage imageWithData:imageData];
     UIImageWriteToSavedPhotosAlbum(output,nil,nil,nil);
+}
+
+//--------------------------------------------------------------
+void ofApp::exit(){
+    screenShot.removeListener(this,&ofApp::screenGrab);
+    swapCam.removeListener(this,&ofApp::swapCamera);
+}
+
+//--------------------------------------------------------------
+void ofApp::screenGrab(){
+    ofxiOSScreenGrab(0);
+    b_screenGrab = false;
+    ofSetColor(0);
+    ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
+}
+
+//--------------------------------------------------------------
+void ofApp::swapCamera(){
+    if (currdeviceID == 0){
+        grabber.close();
+        grabber.setup(camWidth, camHeight);
+        currdeviceID = 1;
+        grabber.setDeviceID(currdeviceID); // front facing camera
+        ofSetColor(0);
+        ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
+        camName = "main cam";
+    } else if ( currdeviceID ==1){
+        grabber.close();
+        grabber.setup(camWidth, camHeight);
+        currdeviceID = 0;
+        grabber.setDeviceID(currdeviceID); // front facing camera
+        ofSetColor(0);
+        ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
+        camName = "front cam";
+    }
+    gui.setName(scanName + " " + camName);
 }

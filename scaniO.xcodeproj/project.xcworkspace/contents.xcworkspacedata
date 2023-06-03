@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:/Users/danbuzzo/Developer/of_v20221017_ios_release/apps/myApps/slitScanPhone/scaniO.xcodeproj">
+      location = "self:">
    </FileRef>
 </Workspace>

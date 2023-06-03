@@ -1,7 +1,7 @@
 /*
  Project Title: video slitscan camera for iOS ScaniO
  Description:
- ©Daniel Buzzo 2022
+ ©Daniel Buzzo 2022, 2023
  dan@buzzo.com
  http://buzzo.com
  https://github.com/danbz
@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ofxiOS.h"
+#include "ofxGui.h"
 
 class ofApp : public ofxiOSApp{
 	
@@ -32,6 +33,8 @@ class ofApp : public ofxiOSApp{
 		void deviceOrientationChanged(int newOrientation);
 
     void saveToPhotos();
+    void screenGrab();
+    void swapCamera();
     
     //ofVideoGrabber grabber;
     ofxiOSVideoGrabber grabber;
@@ -45,6 +48,15 @@ class ofApp : public ofxiOSApp{
     bool b_radial, b_drawCam, b_smooth, b_screenGrab;
     float currTime, camWidth, camHeight;
     string scanName, time, camName;
+    
+    
+    /// gui
+    
+   // ofParameter<bool> mainCam;
+    ofxButton screenShot;
+    ofxButton swapCam;
+    ofParameter<float> frameRate;
+    ofxPanel gui;
     
 };
 
