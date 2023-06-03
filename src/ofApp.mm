@@ -19,13 +19,14 @@
 //--------------------------------------------------------------
 void ofApp::setup(){	
     ofSetOrientation(OF_ORIENTATION_90_RIGHT);//Set iOS to Orientation Landscape Right
-    ofSetFrameRate(60);
+    ofSetFrameRate(120);
     currdeviceID = 0;
     // grabber.setup(480, 360, OF_PIXELS_BGRA);
     grabber.setDeviceID(currdeviceID); // front facing camera
     //grabber.setup(1280, 720, OF_PIXELS_BGRA);
-    grabber.setup(1280, 720);
-    grabber.setDesiredFrameRate(60);
+   // grabber.setup(1280, 720);
+    grabber.setup(640, 460);
+    grabber.setDesiredFrameRate(0);
     
     //// slit scan
     // float aspectRatio = camHeight / camWidth;
@@ -45,6 +46,7 @@ void ofApp::setup(){
     
     videoPixels.allocate(camWidth,camHeight, OF_PIXELS_RGB); // set up our pixel object to be the same size as our camera object
     videoTexture.allocate(videoPixels);
+    swapPixels.allocate(camWidth,camHeight, OF_PIXELS_RGB);
     // ofSetVerticalSync(true);
     ofSetBackgroundColor(0, 0, 0); // set the background colour to  black
     ofDisableSmoothing();
@@ -56,7 +58,6 @@ void ofApp::setup(){
     // gui
     screenShot.addListener(this,&ofApp::screenGrab);
     swapCam.addListener(this,&ofApp::swapCamera);
-    
     // change default sizes for ofxGui so it's usable in small/high density screens
     ofxGuiSetFont("Questrial-Regular.ttf",20,true,true);
     ofxGuiSetTextPadding(4);
@@ -64,11 +65,13 @@ void ofApp::setup(){
     ofxGuiSetDefaultHeight(36);
     gui.setup(scanName + " " + camName);
     gui.add(screenShot.setup("save image", 50, 50));
-    gui.add(swapCam.setup("swap Camera", 50, 50));
-    gui.add(frameRate.set( "speed", 60, 1, 120 ));
-    //  gui.add(mainCam.set("b_main", true));
+    gui.add(swapCam.setup("flip camera", 50, 50));
+    gui.add(frameRate.set( "speed", 60, 1, 60 ));
+    gui.add(hiRes.set("hi resolution image", true));
+    // gui.add(mainCam.set("b_main", true));
     // gui.add(screenSize.set("screenSize", ofToString(ofGetWidth()) + "x" + ofToString(ofGetHeight())));
     gui.setPosition(40, 20);
+    cameraClick.load("camera-click.mp3");
 }
 
 //--------------------------------------------------------------
@@ -76,6 +79,7 @@ void ofApp::update(){
     ofColor color;
     // float micLevel;
     int yHeight;
+    ofImage swapImg;
     ofSetFrameRate(frameRate);
     grabber.update();
     // update the video grabber object
@@ -111,13 +115,16 @@ void ofApp::update(){
             ySteps += speed; // step on to the next line. increase this number to make things faster
             break;
             
+        
+            
         case 3: // scan horizontal from centre
             //if (xSteps < camWidth){
+            
             for (int y=0; y<camHeight; y++ ) { // loop through all the pixels on a line to draw new line at 0 in target image
                 color = pixels.getColor( camWidth/2, y); // get the pixels on line ySteps
                 videoPixels.setColor(1, y, color);
             }
-            
+
             for (int x = camWidth; x>=0; x-= 1){
                 for (int y=0; y<camHeight; y++ ) { // loop through all the pixels on a line
                     videoPixels.setColor(x, y, videoPixels.getColor( x-1, y )); // copy each pixel in the target to 1 pixel the right
@@ -185,13 +192,12 @@ void ofApp::draw(){
         b_screenGrab = false;
         ofSetColor(0);
         ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
-    }
-    
+    }    
     //    ofPushStyle();
     //    ofSetColor(255, 0, 0 );
     //    ofDrawCircle(ofGetWidth()/2 -25 , ofGetHeight() - 45, 25); // draw screenshot button on screen
     //    ofPopStyle();
-    ofDrawBitmapString("FPS: " + ofToString(ofGetFrameRate()) , 20, ofGetHeight()-20);    
+    ofDrawBitmapString("FPS: " + ofToString(ofGetFrameRate()) , 20, ofGetHeight()-20);
     gui.draw();
 }
 
@@ -209,22 +215,7 @@ void ofApp::touchMoved(ofTouchEventArgs & touch){
 //--------------------------------------------------------------
 void ofApp::touchUp(ofTouchEventArgs & touch){
     //    if (touch.y >ofGetHeight()/2 && currdeviceID ==0){
-    //        grabber.close();
-    //        grabber.setup(camWidth, camHeight);
-    //        currdeviceID = 1;
-    //        grabber.setDeviceID(currdeviceID); // front facing camera
-    //        ofSetColor(0);
-    //        ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
-    //        camName = "main camera";
-    //    } else if (touch.y <ofGetHeight()/2 && currdeviceID ==1){
-    //        grabber.close();
-    //        grabber.setup(camWidth, camHeight);
-    //        currdeviceID = 0;
-    //        grabber.setDeviceID(currdeviceID); // front facing camera
-    //        ofSetColor(0);
-    //        ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
-    //        camName = "front camera";
-    //    }
+ 
 }
 
 //--------------------------------------------------------------
@@ -319,7 +310,7 @@ void ofApp::deviceOrientationChanged(int newOrientation){
         default:
             break;
     }
-    cout << "orientation is now: " << ofToString( newOrientation ) << endl;
+  //  cout << "orientation is now: " << ofToString( newOrientation ) << endl;
 }
 //--------------------------------------------------------------
 void ofApp::saveToPhotos(){
@@ -354,6 +345,7 @@ void ofApp::screenGrab(){
     b_screenGrab = false;
     ofSetColor(0);
     ofDrawRectangle(0,0,ofGetWidth(), ofGetHeight());
+    cameraClick.play();
 }
 
 //--------------------------------------------------------------

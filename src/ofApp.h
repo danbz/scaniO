@@ -40,7 +40,7 @@ class ofApp : public ofxiOSApp{
     ofxiOSVideoGrabber grabber;
     
     // /slit scan materials
-    ofPixels videoPixels, pixels;
+    ofPixels videoPixels, pixels, swapPixels;
     ofTexture videoTexture;
     
     int xSteps, ySteps, scanStyle, speed, currdeviceID, newDeviceID;
@@ -55,9 +55,12 @@ class ofApp : public ofxiOSApp{
    // ofParameter<bool> mainCam;
     ofxButton screenShot;
     ofxButton swapCam;
+    ofParameter<bool> hiRes;
+    
     ofParameter<float> frameRate;
     ofxPanel gui;
     
+    ofSoundPlayer cameraClick;
 };
 
 
